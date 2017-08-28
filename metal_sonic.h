@@ -1,5 +1,17 @@
+#ifndef METAL_SONIC_H
+#define METAL_SONIC_H
+
 #include <Arduino.h>
-#define HEDGEHOG_BUF_SIZE 64        // Must be at least 6
+#include "Path_Queue.h"
+#define NUMBER_OF_BEACONS 4
+
+//#define DEBUG 0
+
+#ifdef DEBUG
+	#define CONSOLE(x) Serial.print(F(x))
+#else
+	#define CONSOLE(x) 
+#endif
 
 typedef enum { START, NEXT, END } state_result;
 typedef union { byte b[2]; uint16_t w; } uni_8x2_16;
@@ -17,13 +29,24 @@ state_result cm_frozen_4(int incoming_byte);
 state_result mm_frozen_4(int incoming_byte);
 state_result reading_3(int incoming_byte);
 state_result writing_3(int incoming_byte);
+state_result path_4(int incoming_byte);
+state_result path_5(int incoming_byte);
+state_result path_6(int incoming_byte);
+state_result path_END(int incoming_byte);
+void reset();
 uint16_t crc16_streaming_advance(uint16_t sum, byte b);
 
 struct hedgehog_state_type {
-  byte buf[HEDGEHOG_BUF_SIZE];
+  byte buf[8 + 14 * NUMBER_OF_BEACONS];
   byte buf_ofs = 0;
+  
   state_result (*current_state)(int) = receiving_1;
+  
   uint16_t crc16_sum = 0xffffU;
+  struct {
+    
+  } blank;
+  
   union {
     byte uni8;
     struct {
@@ -37,7 +60,9 @@ struct hedgehog_state_type {
                bit7 : 1;
     } bits;
   } flags;
+
+  byte payload_size;
 };
 
 extern long hedgehog_x, hedgehog_y, hedgehog_z;
-
+#endif
