@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 #include "Path_Queue.h"
+#include "Coordinates.h"
+
 #define NUMBER_OF_BEACONS 4
 
 //#define DEBUG 0
@@ -13,7 +15,7 @@
 	#define CONSOLE(x) 
 #endif
 
-typedef enum { START, NEXT, END } state_result;
+enum state_result { START, NEXT, END };
 typedef union { byte b[2]; uint16_t w; } uni_8x2_16;
 typedef union { byte b[4]; uint32_t v32; } uni_8x4_32;
 
@@ -64,5 +66,5 @@ struct hedgehog_state_type {
   byte payload_size;
 };
 
-extern long hedgehog_x, hedgehog_y, hedgehog_z;
+extern bool coords_packet_received;
 #endif

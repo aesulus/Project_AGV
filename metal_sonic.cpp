@@ -1,9 +1,6 @@
 #include "metal_sonic.h"
 struct hedgehog_state_type hedgehog_state;
 
-long hedgehog_x, hedgehog_y;  // coordinates of hedgehog (X,Y) in mm
-long hedgehog_z;              // height of hedgehog (Z) in mm
-
 state_result receiving_1(int incoming_byte) {
   CONSOLE("receiving_1|");
   if (incoming_byte == 0xff) {
@@ -85,26 +82,21 @@ state_result mm_coordinates_END(int incoming_byte) {
     uni32.b[1] = hedgehog_state.buf[10];
     uni32.b[2] = hedgehog_state.buf[11];
     uni32.b[3] = hedgehog_state.buf[12];
-    hedgehog_x = uni32.v32;
+    new_coord.x = uni32.v32 / 1000.0;
 
     uni32.b[0] = hedgehog_state.buf[13];
     uni32.b[1] = hedgehog_state.buf[14];
     uni32.b[2] = hedgehog_state.buf[15];
     uni32.b[3] = hedgehog_state.buf[16];
-    hedgehog_y = uni32.v32;
+    new_coord.y = uni32.v32 / 1000.0;
 
     uni32.b[0] = hedgehog_state.buf[17];
     uni32.b[1] = hedgehog_state.buf[18];
     uni32.b[2] = hedgehog_state.buf[19];
     uni32.b[3] = hedgehog_state.buf[20];
-    hedgehog_z = uni32.v32;
+    new_coord.z = uni32.v32 / 1000.0;
 	
-    Serial.print( "X=");
-    Serial.print(hedgehog_x);
-    Serial.print(" Y=");
-    Serial.print(hedgehog_y);
-    Serial.print(" Z=");
-    Serial.println(hedgehog_z);
+    coords_packet_received = true;
   }
   return 0;
 }
@@ -148,14 +140,26 @@ state_result path_6(int incoming_byte) {
 }
 
 state_result path_END(int incoming_byte) {
-  // We're going to ignore it if it's 5 for now.
-  if (hedgehog_state.buf[5] == 5) {
-    path_command current_path;
-    current_path.movement_type = hedgehog_state.buf[5];
-    current_path.param1 = hedgehog_state.buf[8] + hedgehog_state.buf[9] << 8;
-    current_path.param2 = hedgehog_state.buf[10] + hedgehog_state.buf[11] << 8;
+  path_command current_path;
+  current_path.movement_type = hedgehog_state.buf[5];
+  current_path.param1 = hedgehog_state.buf[8] + (hedgehog_state.buf[9] << 8);
+  current_path.param2 = hedgehog_state.buf[10] + (hedgehog_state.buf[11] << 8);
+  
+  // Serial.print(F("Received path type: "));
+  // Serial.print(current_path.movement_type);
+  // Serial.print(F(" P1: "));
+  // Serial.print(current_path.param1);
+  // Serial.print(F(" P2: "));
+  // Serial.print(current_path.param2);
+  
+  if (current_path.movement_type == 6) {
     enqueue(current_path);
+    // Serial.print(F(" Enqueued. Queue size: "));
+    // Serial.println(getSize());
   }
+  // else {
+    // Serial.println(F(" Not enqueued."));
+  // }
   return 0;
 }
 

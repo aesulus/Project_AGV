@@ -5,7 +5,7 @@
 
 path_command pathArray[QUEUE_MAX_SIZE];
 uint8_t front = 0;
-uint8_t back = 0;
+uint8_t back = -1;
 uint8_t itemCount = 0;
 
 path_command getFront() {
