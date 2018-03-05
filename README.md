@@ -3,6 +3,9 @@ Description
 Project AGV is a firmware program written in C++ for the Arduino Uno and the Marvelmind platforms.
 The presence of objects other than air in between any two beacons WILL distort the time of flight for each ultrasonic pulse,
 leading to erroneous results.
+![The barebones car with 9V battery](/images/car_barebones.jpg)
+![The car wiring](/images/car_wiring.jpg)
+![Marvelmind Information Flow Diagram](/images/marvelmind_info_flow_diagram.jpg)
 
 Motor control/Steering
 ----------------------
