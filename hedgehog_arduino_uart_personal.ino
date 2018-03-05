@@ -10,7 +10,7 @@
 
 // Thresholds
 #define RADIUS_THRESHOLD 0.3 // meters
-#define ANGLE_THRESHOLD 20 // degrees
+#define ANGLE_THRESHOLD 3 // degrees
 #define TIME_TIL_TIMEOUT 800 // milliseconds
 #define OBTUSE_ANGLE_IGNORANCE_THRESHOLD 3 // ignores
 
@@ -98,6 +98,15 @@ void setup_hedgehog() {
 
 void setup() {
   lcd.begin(16, 2);
+  
+  // Flash twice on startup
+  lcd.setColor(0);
+  delay(10);
+  lcd.setColorAll();
+  delay(200);
+  lcd.setColor(0);
+  delay(10);
+  
   update_Mode(FRESH_BOOT_MODE);
 
   setup_hedgehog();
@@ -121,27 +130,29 @@ void update_Mode(mode new_mode) {
     lcd.clear();
     
     switch (Mode) {
-    case WHITE_MODE:
-    case ERROR_MODE:
-    case TARGET_PURSUIT_MODE:
-      lcd.setColor(Mode);
-      break;
-    case READY_MODE:
-      lcd.setColor(3);
-      lcd.print(F("X="));
-      lcd.setCursor(0, 1);
-      lcd.print(F("Y="));
-      break;
-    case IDLE_MODE:
-      motor_off();
-      turn_neutral();
-      
-      lcd.setColorAll();
-      lcd.print(F("Listening..."));
-      break;
-    case FRESH_BOOT_MODE:
-      lcd.setColorAll();
-      lcd.print(F("No signal."));
+      case WHITE_MODE:
+      case ERROR_MODE:
+        lcd.setColor(Mode);
+        break;
+      case TARGET_PURSUIT_MODE:
+        lcd.setColor(2);
+        break;
+      case READY_MODE:
+        lcd.setColor(3);
+        lcd.print(F("X="));
+        lcd.setCursor(0, 1);
+        lcd.print(F("Y="));
+        break;
+      case IDLE_MODE:
+        motor_off();
+        turn_neutral();
+        
+        lcd.setColorAll();
+        lcd.print(F("Listening..."));
+        break;
+      case FRESH_BOOT_MODE:
+        lcd.setColorAll();
+        lcd.print(F("No signal."));
     }
   }
 }
@@ -190,12 +201,14 @@ void (*move_backward)() = motor_rear;
 void flip_direction() {
   front_facing = !front_facing;
   if (front_facing) {
+    lcd.setColor(2);
     turn_left = steer_wheel_CCW;
     turn_right = steer_wheel_CW;
     move_forward = motor_front;
     move_backward = motor_rear;
   }
   else {
+    lcd.setColor(1);
     turn_left = steer_wheel_CW;
     turn_right = steer_wheel_CCW;
     move_forward = motor_rear;
@@ -241,13 +254,19 @@ void loop() {
       }
     }
     
-    update_Mode(TARGET_PURSUIT_MODE);
-    
     target_bearing = getAngle(target_coord, new_coord);
-    
     delta_angle = getDeltaAngle(target_bearing, car_bearing);
     delta_distance = getDistance(new_coord, target_coord);
     
+    update_Mode(TARGET_PURSUIT_MODE);
+    lcd.clear();
+    lcd.print(F("DA="));
+    lcd.print(delta_angle);
+    lcd.setCursor(0, 1);
+    lcd.print(F("DD="));
+    lcd.print(delta_distance);
+    
+    // Target reached
     if (delta_distance <= RADIUS_THRESHOLD) {
       update_Mode(ERROR_MODE);
       
@@ -256,12 +275,11 @@ void loop() {
       motor_off();
       turn_neutral();
     }
+    // Begin corrective actions here
     else {
-      // Begin corrective actions here
       if (fabs(delta_angle) < ANGLE_THRESHOLD) {
         update_Mode(WHITE_MODE);
         turn_neutral();
-        motor_off();
       }
       else {
         // If reported angle is obtuse, ignore it unless ignore count
@@ -270,13 +288,14 @@ void loop() {
           ++obtuse_angle_count;
           if (obtuse_angle_count >= OBTUSE_ANGLE_IGNORANCE_THRESHOLD) {
             flip_direction();
+            obtuse_angle_count = 0;
           }
         }
         else {
           obtuse_angle_count = 0;
         }
         
-        if (delta_angle > 0) {
+        if (delta_angle < 0) {
           turn_left();
         }
         else {

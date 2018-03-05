@@ -4,8 +4,8 @@
 
 struct path_command {
   uint8_t movement_type;
-  uint16_t param1;
-  uint16_t param2;
+  int16_t param1;
+  int16_t param2;
 };
 
 path_command getFront();

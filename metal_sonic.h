@@ -16,8 +16,6 @@
 #endif
 
 enum state_result { START, NEXT, END };
-typedef union { byte b[2]; uint16_t w; } uni_8x2_16;
-typedef union { byte b[4]; uint32_t v32; } uni_8x4_32;
 
 state_result receiving_1(int incoming_byte);
 state_result receiving_2(int incoming_byte);

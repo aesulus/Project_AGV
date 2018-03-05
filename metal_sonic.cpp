@@ -1,6 +1,9 @@
 #include "metal_sonic.h"
 struct hedgehog_state_type hedgehog_state;
 
+typedef union { byte b[2]; int16_t w; } uni_8x2_16;
+typedef union { byte b[4]; int32_t v32; } uni_8x4_32;
+
 state_result receiving_1(int incoming_byte) {
   CONSOLE("receiving_1|");
   if (incoming_byte == 0xff) {
@@ -140,10 +143,18 @@ state_result path_6(int incoming_byte) {
 }
 
 state_result path_END(int incoming_byte) {
+  uni_8x2_16 uni16;
+  
   path_command current_path;
   current_path.movement_type = hedgehog_state.buf[5];
-  current_path.param1 = hedgehog_state.buf[8] + (hedgehog_state.buf[9] << 8);
-  current_path.param2 = hedgehog_state.buf[10] + (hedgehog_state.buf[11] << 8);
+  
+  uni16.b[0] = hedgehog_state.buf[8];
+  uni16.b[1] = hedgehog_state.buf[9];
+  current_path.param1 = uni16.w;
+  
+  uni16.b[0] = hedgehog_state.buf[10];
+  uni16.b[1] = hedgehog_state.buf[11];
+  current_path.param2 = uni16.w;
   
   // Serial.print(F("Received path type: "));
   // Serial.print(current_path.movement_type);

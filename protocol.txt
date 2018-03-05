@@ -8,18 +8,18 @@ CRC-16 values are denoted by C C.
 Hedgehog address bytes are denoted by @
 
 Stages:               01 02 03 04 05 06   07  08 09 10 11
-#RECEIVING:			  -----------------------------------
+#RECEIVING:           -----------------------------------
 Streaming packet:     ff 47 V  V  L  <N>  C   C 
     CM coordinates:   ff 47 01 00 10 <16> C   C 
     MM coordinates:   ff 47 11 00 16 <22> C   C
     CM frozen:        ff 47 02 00 L  <N>  C   C
-    MM frozen:        ff 47 12 00 L  L   <N> C  C
+    MM frozen:        ff 47 12 00 L  L   <N>  C  C
 Reading packet:       ff 49 V  02 04 00   00  00 00 C  C
 Writing packet:       ff 4a V  02 L  <N>  C   C
     Path packet:      ff 4a 01 02 0c <12> C   C
 
 Stages:               01 02 03 04 05 06  07 08 09 10 11
-#SENDING:			  ---------------------------------
+#SENDING:             ---------------------------------
 Receive confirmation: @  48 00 01 04 V   00 00 00 C  C
 Reading:
     Confirmation:     @  49 V  02 L  <N> C  C
