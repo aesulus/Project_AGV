@@ -18,6 +18,7 @@ This code was last run and successfully tested on:
 
 Wireless communication
 ----------------------
+A typical Marvelmind set comes with one **modem** unit and 5 wireless ultrasonic beacons. Each beacon has the same hardware, and all must run the same firmware. However, one beacon can be designdated as the **mobile beacon**, or more appropiately called the **hedgehog** by its developers. The mobile beacon is allowed to move in free space and is tracked by the rest of the beacons called  **stationary beacons**. These beacons, once they have been "set", must remain in place relative to each other.
 The presence of objects other than air in between any two beacons WILL distort the time of flight for each ultrasonic pulse,
 leading to erroneous results.
 ![Marvelmind Information Flow Diagram](/images/marvelmind_info_flow_diagram.jpg)
